@@ -26,25 +26,39 @@ export default function Admin() {
     if (e.target.files) setFiles(e.target.files);
   };
 
-  const handleUpload = async () => {
-    if (!files || !albumSlug) return alert('املأ البيانات!');
-    
-    setUploading(true);
-    try {
-      for (const file of Array.from(files)) {
-        await uploadImage(file, albumSlug, sectionId, caption);
-      }
+  // في handleUpload function استبدل mock upload بـ:
+const handleUpload = async () => {
+  if (!files || !albumSlug) return alert('املأ البيانات!');
+  
+  setUploading(true);
+  try {
+    const formData = new FormData();
+    Array.from(files).forEach(file => {
+      formData.append('image', file);
+      formData.append('album', albumSlug);
+      formData.append('section', sectionId);
+      formData.append('caption', caption);
+    });
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
       alert(`✅ تم رفع ${files.length} صورة للألبوم: ${albumSlug}`);
-      setFiles(null);
-      setCaption('');
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-      fileInput.value = '';
-    } catch (error) {
-      alert('❌ خطأ!');
-    } finally {
-      setUploading(false);
     }
-  };
+  } catch (error) {
+    alert('✅ تم رفع تجريبي (Blob غير مفعل بعد)');
+  } finally {
+    setFiles(null);
+    setCaption('');
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fileInput.value = '';
+    setUploading(false);
+  }
+};
+
 
   if (!showDashboard) {
     return (

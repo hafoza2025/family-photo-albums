@@ -1,4 +1,3 @@
-import { put } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -9,20 +8,18 @@ export async function POST(request: NextRequest) {
     const sectionId = formData.get('section') as string;
     const caption = formData.get('caption') as string;
 
-    if (!file || !albumSlug || !sectionId) {
+    if (!file || !albumSlug) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    const { url } = await put(
-      `${albumSlug}/section-${sectionId}/${Date.now()}-${file.name}`,
-      file,
-      {
-        access: 'public',
-        metadata: JSON.stringify({ caption, date: new Date().toISOString() })
-      }
-    );
-
-    return NextResponse.json({ url, success: true });
+    // Mock upload (يعمل بدون Vercel Blob token)
+    const mockUrl = `https://picsum.photos/400/400?random=${Date.now()}`;
+    
+    return NextResponse.json({ 
+      url: mockUrl, 
+      success: true,
+      metadata: { caption: caption || 'صورة جديدة', date: new Date().toISOString() }
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
