@@ -1,11 +1,9 @@
 export function checkAdminAuth(user: string, pass: string): boolean {
-  return user === 'admin' && pass === 'secret123';
+  return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS;
 }
 
 export function checkAlbumAuth(albumSlug: string, user: string, pass: string): boolean {
-  const mockUsers: Record<string, {user: string, pass: string}> = {
-    'test': {user: 'testuser', pass: 'testpass'},
-    'wedding': {user: 'wedding', pass: '123456'}
-  };
-  return (mockUsers[albumSlug]?.user === user) && (mockUsers[albumSlug]?.pass === pass);
+  const albumUser = process.env[`NEXT_PUBLIC_ALBUM_${albumSlug.toUpperCase()}_USER`];
+  const albumPass = process.env[`NEXT_PUBLIC_ALBUM_${albumSlug.toUpperCase()}_PASS`];
+  return user === albumUser && pass === albumPass;
 }
